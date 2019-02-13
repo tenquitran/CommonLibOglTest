@@ -46,20 +46,25 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 
         OpenGLInfo openGLInfo(OpenGLVersionMajor, OpenGLVersionMinor, FieldOfView, FrustumNear, FrustumFar);
 
-        // TODO: populate the scene.
+#if 0
+        // TODO: populate the scene and somehow pass GLSL program ID and camera to it.
         std::shared_ptr<Scene> spScene = std::make_shared<Scene>();
+#endif
 
         // TODO: uncomment
 #if 0
+        const ShaderCollection shaders = {
+            { GL_VERTEX_SHADER,   "shaders\\scene.vert" },
+            { GL_FRAGMENT_SHADER, "shaders\\scene.frag" }
+        };
+
         WindowMain mainWindow(hInstance, wndInfo, openGLInfo, spScene);
         //WindowMain(HINSTANCE hInstance, const WindowInfo& wndInfo, const OpenGLInfo& openGLInfo, std::weak_ptr<OglScene>& scene);
+
+        // Won't work until we pass shaders to WindowMain::runMessageLoop()
+        //GLuint programId = mainWindow.getGlslProgramId();
 #endif
 
-        // TODO: create shaders
-        const ShaderCollection shaders = {
-            { GL_VERTEX_SHADER,   "shaders\\terrain.vert" },
-            { GL_FRAGMENT_SHADER, "shaders\\terrain.frag" }
-        };
 
         // TODO: uncomment
 #if 0

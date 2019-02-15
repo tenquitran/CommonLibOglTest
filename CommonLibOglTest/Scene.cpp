@@ -123,6 +123,32 @@ void Scene::updateUniforms() const
 #endif
 }
 
+void Scene::translateCamera(const glm::vec3& diff)
+{
+    m_spCamera->translate(diff);
+
+    updateUniforms();
+}
+
+void Scene::rotateCamera(const glm::vec3& degrees)
+{
+    m_spCamera->rotate(degrees);
+
+    updateUniforms();
+}
+
+GLfloat Scene::getCameraScale() const
+{
+    return m_spCamera->getScale();
+}
+
+void Scene::scaleCamera(GLfloat amount)
+{
+    m_spCamera->scale(amount);
+
+    updateUniforms();
+}
+
 void Scene::resize(GLfloat aspectRatio)
 {
     m_spCamera->resize(aspectRatio);

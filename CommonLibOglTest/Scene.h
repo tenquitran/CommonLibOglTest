@@ -20,6 +20,18 @@ namespace CommonLibOglTestApp
         // Render the derived scene.
         virtual void render() const override;
 
+        //////////////////////////////////////////////////////////////////////////
+        // Camera control.
+        //////////////////////////////////////////////////////////////////////////
+
+        virtual void translateCamera(const glm::vec3& diff) override;
+
+        virtual void rotateCamera(const glm::vec3& degrees) override;
+
+        virtual void scaleCamera(GLfloat amount) override;
+
+        GLfloat getCameraScale() const;
+
     private:
         // Initialize scene contents (usually something that will be rendered - e.g. a cube).
         bool initializeContents();

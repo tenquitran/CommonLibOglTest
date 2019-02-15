@@ -7,7 +7,7 @@
 
 #include "CommonLibOglTest.h"
 
-#define MAX_LOADSTRING 100
+#define MaxLoadString 100
 
 // Global Variables:
 HINSTANCE hInst;								// current instance

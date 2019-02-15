@@ -3,12 +3,14 @@
 
 //////////////////////////////////////////////////////////////////////////
 
+using namespace CommonLibOgl;
 using namespace CommonLibOglTestApp;
 
 //////////////////////////////////////////////////////////////////////////
 
 
-Scene::Scene()
+Scene::Scene(const glm::vec3& backgroundColor, CameraPtr& spCamera, GLuint programId)
+    : m_backgroundColor(backgroundColor), m_spCamera(spCamera), m_programId(programId)
 {
 }
 
@@ -35,6 +37,45 @@ Scene::~Scene()
 }
 
 bool Scene::initialize()
+{
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
+
+    glEnable(GL_MULTISAMPLE);
+
+    glClearColor(m_backgroundColor.r, m_backgroundColor.g, m_backgroundColor.b, 1.0f);
+
+#if 0
+    glm::vec3 cameraPosition = { 0.0f, 0.0f, -5.0f };
+
+    m_spCamera = std::make_unique<Camera>(cameraPosition, aspectRatio, CameraScaleFactor,
+        openGlInfo.FieldOfView, openGlInfo.FrustumNear, openGlInfo.FrustumFar);
+#endif
+
+#if 0
+    // Initialize the program wrapper.
+
+    m_spProgram = std::make_unique<ProgramGLSL>(shaders);
+
+    if (!initializeDerived())
+    {
+        std::wcerr << L"OglScene: derived class initialization failed\n";
+        ATLASSERT(FALSE); return false;
+    }
+#endif
+
+    if (!initializeContents())
+    {
+        std::wcerr << L"Failed to initialize scene contents\n";
+        return 1;
+    }
+
+    updateUniforms();
+
+    return true;
+}
+
+bool Scene::initializeContents()
 {
     glGenVertexArrays(1, &m_vao);
     glBindVertexArray(m_vao);
@@ -68,16 +109,12 @@ bool Scene::initialize()
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    // Our shaders don't use the function yet.
-    // Eventually create something more complex and uncomment this function.
-#if 0
-    updateUniforms(spCamera);
-#endif
+    updateUniforms();
 
     return true;
 }
 
-void Scene::updateUniforms(const std::unique_ptr<CommonLibOgl::Camera>& spCamera) const
+void Scene::updateUniforms() const
 {
     // Our shaders don't use the function yet.
     // Eventually create something more complex and uncomment this function.
@@ -86,9 +123,9 @@ void Scene::updateUniforms(const std::unique_ptr<CommonLibOgl::Camera>& spCamera
 
     glUseProgram(m_programId);
 
-    glm::mat4 proj  = spCamera->getProjectionMatrix();
-    glm::mat4 view  = spCamera->getViewMatrix();
-    glm::mat4 model = spCamera->getModelMatrix();
+    glm::mat4 proj  = m_spCamera->getProjectionMatrix();
+    glm::mat4 view  = m_spCamera->getViewMatrix();
+    glm::mat4 model = m_spCamera->getModelMatrix();
 
     // Apply translation.
     model *= glm::translate(glm::mat4(1.0f), m_translation);
@@ -120,15 +157,18 @@ void Scene::updateUniforms(const std::unique_ptr<CommonLibOgl::Camera>& spCamera
 #endif
 }
 
+void Scene::resize(GLfloat aspectRatio)
+{
+    m_spCamera->resize(aspectRatio);
+
+    updateUniforms();
+}
+
 void Scene::render() const
 {
     ATLASSERT(m_programId);
 
-    // Our shaders don't use the function yet.
-    // Eventually create something more complex and uncomment this function.
-#if 0
-    updateUniforms(spCamera);
-#endif
+    updateUniforms();
 
     glUseProgram(m_programId);
     glBindVertexArray(m_vao);

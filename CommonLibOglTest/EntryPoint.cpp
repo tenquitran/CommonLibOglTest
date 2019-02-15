@@ -46,30 +46,41 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 
         OpenGLInfo openGLInfo(OpenGLVersionMajor, OpenGLVersionMinor, FieldOfView, FrustumNear, FrustumFar);
 
-#if 0
-        // TODO: populate the scene and somehow pass GLSL program ID and camera to it.
-        std::shared_ptr<Scene> spScene = std::make_shared<Scene>();
-#endif
+        glm::vec3 cameraPosition = { 0.0f, 0.0f, -5.0f };
 
-        // TODO: uncomment
-#if 0
+        // Initial scale factor for the camera.
+        const GLfloat CameraScaleFactor = 1.0f;
+
+        // Create an OpenGL camera.
+
+        std::shared_ptr<CommonLibOgl::Camera> spCamera = std::make_shared<Camera>(
+            cameraPosition, CameraScaleFactor, FieldOfView, FrustumNear, FrustumFar);
+
+        // Create main window (internally, sets up an OpenGL context).
+
+        WindowMain mainWindow(hInstance, nCmdShow, wndInfo, openGLInfo);
+
+        // Create a GLSL program.
+
         const ShaderCollection shaders = {
             { GL_VERTEX_SHADER,   "shaders\\scene.vert" },
-            { GL_FRAGMENT_SHADER, "shaders\\scene.frag" }
-        };
+            { GL_FRAGMENT_SHADER, "shaders\\scene.frag" } };
 
-        WindowMain mainWindow(hInstance, wndInfo, openGLInfo, spScene);
-        //WindowMain(HINSTANCE hInstance, const WindowInfo& wndInfo, const OpenGLInfo& openGLInfo, std::weak_ptr<OglScene>& scene);
+        ProgramGLSL program(shaders);
 
-        // Won't work until we pass shaders to WindowMain::runMessageLoop()
-        //GLuint programId = mainWindow.getGlslProgramId();
-#endif
+        if (!program.validate())
+        {
+            std::wcerr << L"GLSL program validation failed\n";
+            ATLASSERT(FALSE); return 1;
+        }
 
+        // Create an OpenGL scene and pass it to the main window.
 
-        // TODO: uncomment
-#if 0
-        res = mainWindow.runMessageLoop(nCmdShow, shaders);
-#endif
+        glm::vec3 backgroundColor(0.8f, 0.93f, 0.96f);    // very light blue
+
+        std::shared_ptr<IScene> spScene = std::make_shared<Scene>(backgroundColor, spCamera, program.getProgram());
+
+        res = mainWindow.runMessageLoop(spScene);
     }
     catch (const Exception& ex)
     {

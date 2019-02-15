@@ -45,25 +45,6 @@ bool Scene::initialize()
 
     glClearColor(m_backgroundColor.r, m_backgroundColor.g, m_backgroundColor.b, 1.0f);
 
-#if 0
-    glm::vec3 cameraPosition = { 0.0f, 0.0f, -5.0f };
-
-    m_spCamera = std::make_unique<Camera>(cameraPosition, aspectRatio, CameraScaleFactor,
-        openGlInfo.FieldOfView, openGlInfo.FrustumNear, openGlInfo.FrustumFar);
-#endif
-
-#if 0
-    // Initialize the program wrapper.
-
-    m_spProgram = std::make_unique<ProgramGLSL>(shaders);
-
-    if (!initializeDerived())
-    {
-        std::wcerr << L"OglScene: derived class initialization failed\n";
-        ATLASSERT(FALSE); return false;
-    }
-#endif
-
     if (!initializeContents())
     {
         std::wcerr << L"Failed to initialize scene contents\n";
@@ -85,8 +66,7 @@ bool Scene::initializeContents()
     std::vector<GLfloat> vertices = {
         -0.90f, -0.90f, 0.0f,
          0.85f, -0.90f, 0.0f,
-        -0.90f,  0.85f, 0.0f
-    };
+        -0.90f,  0.85f, 0.0f };
 
     glGenBuffers(1, &m_vbo);
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
@@ -116,42 +96,28 @@ bool Scene::initializeContents()
 
 void Scene::updateUniforms() const
 {
-    // Our shaders don't use the function yet.
-    // Eventually create something more complex and uncomment this function.
+    // Our shaders don't use the uniforms.
+    // The code is left as a reference for more complex projects.
 #if 0
     ATLASSERT(m_programId);
 
     glUseProgram(m_programId);
 
-    glm::mat4 proj  = m_spCamera->getProjectionMatrix();
-    glm::mat4 view  = m_spCamera->getViewMatrix();
-    glm::mat4 model = m_spCamera->getModelMatrix();
+    // TODO:
+    //     1) comment out the uniforms you don't need.
+    //     2) correct the uniform locations if required.
+    glUniformMatrix4fv(0, 1, GL_FALSE, glm::value_ptr(m_spCamera->getModelViewProjectionMatrix()));
+    glUniformMatrix4fv(1, 1, GL_FALSE, glm::value_ptr(m_spCamera->getProjectionMatrix()));
 
-    // Apply translation.
-    model *= glm::translate(glm::mat4(1.0f), m_translation);
+    glm::mat4 modelView = m_spCamera->getModelViewMatrix();
 
-    // Apply rotation.
-    model *= glm::rotate(glm::mat4(1.0f), glm::radians(m_rotationDegrees.x), glm::vec3(1.0f, 0.0f, 0.0));    // X axis
-    model *= glm::rotate(glm::mat4(1.0f), glm::radians(m_rotationDegrees.y), glm::vec3(0.0f, 1.0f, 0.0));    // Y axis
-    model *= glm::rotate(glm::mat4(1.0f), glm::radians(m_rotationDegrees.z), glm::vec3(0.0f, 0.0f, 1.0));    // Z axis
-
-    // Apply scaling.
-    model *= glm::scale(glm::mat4(1.0f), glm::vec3(m_scaleFactor));
-
-    glm::mat4 mv = view * model;
-
-    glm::mat4 mvp = proj * view * model;
-
-    glUseProgram(m_programId);
-
-    glUniformMatrix4fv(0, 1, GL_FALSE, glm::value_ptr(mvp));
-
-    glUniformMatrix4fv(1, 1, GL_FALSE, glm::value_ptr(mv));
-
-    glm::mat3 normal = glm::mat3(glm::transpose(glm::inverse(mv)));
+    // WARNING: we are using the fact that there are no non-uniform scaling. If this will change, use the entire 4x4 matrix.
+    glm::mat3 normal = glm::mat3(glm::transpose(glm::inverse(modelView)));
     //glm::mat3 normal = glm::mat3(glm::vec3(mv[0]), glm::vec3(mv[1]), glm::vec3(mv[2]));
 
     glUniformMatrix3fv(2, 1, GL_FALSE, glm::value_ptr(normal));
+
+    glUniformMatrix4fv(3, 1, GL_FALSE, glm::value_ptr(modelView));
 
     glUseProgram(0);
 #endif

@@ -48,7 +48,7 @@ bool Scene::initialize()
     if (!initializeContents())
     {
         std::wcerr << L"Failed to initialize scene contents\n";
-        return 1;
+        return false;
     }
 
     updateUniforms();
@@ -106,7 +106,9 @@ void Scene::updateUniforms() const
     // TODO:
     //     1) comment out the uniforms you don't need.
     //     2) correct the uniform locations if required.
+
     glUniformMatrix4fv(0, 1, GL_FALSE, glm::value_ptr(m_spCamera->getModelViewProjectionMatrix()));
+
     glUniformMatrix4fv(1, 1, GL_FALSE, glm::value_ptr(m_spCamera->getProjectionMatrix()));
 
     glm::mat4 modelView = m_spCamera->getModelViewMatrix();

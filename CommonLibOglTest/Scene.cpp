@@ -61,12 +61,15 @@ bool Scene::initializeContents()
     glGenVertexArrays(1, &m_vao);
     glBindVertexArray(m_vao);
 
+    // Two triangles.
+
     // Set up the vertex buffer.
 
     std::vector<GLfloat> vertices = {
         -0.90f, -0.90f, 0.0f,
          0.85f, -0.90f, 0.0f,
-        -0.90f,  0.85f, 0.0f };
+        -0.90f,  0.85f, 0.0f,
+         0.85f,  0.85f, 0.0f };
 
     glGenBuffers(1, &m_vbo);
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
@@ -78,7 +81,9 @@ bool Scene::initializeContents()
 
     // Set up the index buffer.
 
-    std::vector<GLuint> indices = {0, 1, 2};
+    std::vector<GLuint> indices = {
+        0, 1, 2, 
+        1, 3, 2 };
 
     m_indexCount = indices.size();
 
@@ -161,6 +166,8 @@ void Scene::resize(GLfloat aspectRatio)
 void Scene::render() const
 {
     ATLASSERT(m_programId);
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     updateUniforms();
 

@@ -49,7 +49,7 @@ namespace CommonLibOglTestApp
 
         //////////////////////////////////////////////////////////////////////////
 
-        // Scene contents: a triangle.
+        // Scene contents.
 
         GLuint m_vao = {};
         GLuint m_vbo = {};
